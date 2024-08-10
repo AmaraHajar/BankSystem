@@ -1,7 +1,7 @@
 package org.solareflare.project.BankSystemMangement.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.solareflare.project.BankSystemMangement.bl.AuthenticationService;
+import org.solareflare.project.BankSystemMangement.services.AuthenticationService;
 import org.solareflare.project.BankSystemMangement.dto.JwtAuthenticationResponse;
 import org.solareflare.project.BankSystemMangement.dto.SignInRequest;
 import org.solareflare.project.BankSystemMangement.dto.SignUpRequest;

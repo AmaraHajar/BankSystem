@@ -1,7 +1,7 @@
 package org.solareflare.project.BankSystemMangement.exceptions;
 
 
-
+import org.solareflare.project.BankSystemMangement.beans.Customer;
 
 public class CustomException extends RuntimeException {
     private final String typeName;
@@ -22,4 +22,12 @@ public class CustomException extends RuntimeException {
     }
 }
 
+
+//
+//public class CustomerNotRegisteredException extends CustomException {
+//    public CustomerNotRegisteredException() {
+//        super(Customer.class, "Customer not registered or does not exist");
+//    }
+//}
+//
 

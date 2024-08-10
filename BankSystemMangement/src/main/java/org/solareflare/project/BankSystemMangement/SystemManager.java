@@ -2,9 +2,12 @@ package org.solareflare.project.BankSystemMangement;
 
 
 import org.solareflare.project.BankSystemMangement.beans.*;
-import org.solareflare.project.BankSystemMangement.bl.*;
-import org.solareflare.project.BankSystemMangement.exceptions.*;
+import org.solareflare.project.BankSystemMangement.exceptions.CustomException;
+import org.solareflare.project.BankSystemMangement.exceptions.CustomerNotRegisteredException;
+import org.solareflare.project.BankSystemMangement.services.*;
 import org.solareflare.project.BankSystemMangement.utils.ActionStatus;
+import org.solareflare.project.BankSystemMangement.utils.Patterns;
+import org.solareflare.project.BankSystemMangement.utils.Validation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -16,24 +19,34 @@ import java.time.Instant;
 public class SystemManager {
 
     @Autowired
-    private CustomerBL customerBL;
+    private CustomerService customerService;
 
     @Autowired
-    private AccountBL accountBL;
+    private AccountService accountService;
 
     @Autowired
-    private LoanBL loanBL;
+    private LoanService loanService;
 
     @Autowired
-    private BankBL bankBL;
+    private BankService bankBL;
 
     @Value("${bank.name}")
     private String bankName;
 
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private PaymentService paymentService;
+
+    @Autowired
+    private TransactionService transactionService;
+
+
     public void run() throws Exception {
 
-        Bank bank =  bankBL.getByName(bankName);
-        Address address =  bank.getAddress();
+        Bank bank = bankBL.getByName(bankName);
+        Address address = bank.getAddress();
         ///// Add new Customer
         Customer customer = Customer.customerBuilder()
                 .firstName("Hajar")
@@ -44,11 +57,11 @@ public class SystemManager {
                 .build();
 
 
-        customer = customerBL.addCustomer(customer);
+        customer = customerService.addCustomer(customer);
         customer.setBank(bank);
         customer.setAddress(address);
 
-        customer = customerBL.updateCustomer(customer);
+        customer = customerService.updateCustomer(customer);
 
         /////// Create new account for the customer
 
@@ -57,7 +70,7 @@ public class SystemManager {
                 .balance(new BigDecimal(5000))
                 .bank(bank).build();
 
-        account = accountBL.addAccount(account);
+        account = accountService.addAccount(account);
 
         Loan loan = Loan.builder()
                 .amount(2500.0)
@@ -66,11 +79,11 @@ public class SystemManager {
                 .status(ActionStatus.APPROVED)
                 .monthlyRepayment(500.0).build();
 
-        loan = loanBL.addLoan(loan);
+        loan = loanService.addLoan(loan);
         account.setBalance(account.getBalance().add(new BigDecimal(loan.getAmount())));
-        accountBL.updateAccount(account);
+        accountService.updateAccount(account);
 
-        account = accountBL.withdraw(account.getId(), loan.getAmount());
+        account = accountService.withdraw(account.getId(), loan.getAmount());
 
         Payment payment = Payment.builder()
                 .date(Instant.now())
@@ -78,13 +91,8 @@ public class SystemManager {
                 .amount(500.0)
                 .loan(loan)
                 .build();
-        loan = loanBL.updateLoanPayment(payment);
+        loan = loanService.updateLoanPayment(payment);
 
-        account = accountBL.deposit(account.getId(),200.0);
-
-
-
+        account = accountService.deposit(account.getId(), 200.0);
     }
-
-
 }

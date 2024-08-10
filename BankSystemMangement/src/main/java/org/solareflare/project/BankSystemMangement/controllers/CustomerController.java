@@ -1,13 +1,12 @@
 package org.solareflare.project.BankSystemMangement.controllers;
 
-
 import org.solareflare.project.BankSystemMangement.beans.Customer;
-import org.solareflare.project.BankSystemMangement.bl.AuthenticationService;
-import org.solareflare.project.BankSystemMangement.bl.CustomerBL;
+import org.solareflare.project.BankSystemMangement.services.AuthenticationService;
 import org.solareflare.project.BankSystemMangement.dto.JwtAuthenticationResponse;
 import org.solareflare.project.BankSystemMangement.dto.SignUpRequest;
 import org.solareflare.project.BankSystemMangement.dto.UserRequest;
 import org.solareflare.project.BankSystemMangement.exceptions.*;
+import org.solareflare.project.BankSystemMangement.services.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +19,7 @@ import java.util.List;
 public class CustomerController {
 
     @Autowired
-    private CustomerBL customerBL;
+    private CustomerService customerService;
 
     @Autowired
     private AuthenticationService authenticationService;
@@ -39,7 +38,7 @@ public class CustomerController {
     @GetMapping("/get/all")
     public ResponseEntity<List<Customer>> getAllCustomers() {
         try {
-            List<Customer> customers = customerBL.getAllCustomers();
+            List<Customer> customers = customerService.getAllCustomers();
             return ResponseEntity.ok(customers);
         } catch (Exception e) {
             e.printStackTrace();
@@ -50,7 +49,7 @@ public class CustomerController {
     @GetMapping("/{id}")
     public ResponseEntity<Customer> getCustomerById(@PathVariable Long id) {
         try {
-            Customer customer = customerBL.getCustomerById(id);
+            Customer customer = customerService.getCustomerById(id);
             return ResponseEntity.ok(customer);
         } catch (CustomerNotRegisteredException e) {
             e.printStackTrace();
@@ -61,7 +60,7 @@ public class CustomerController {
     @GetMapping("/idNumber/{idNumber}")
     public ResponseEntity<Customer> getCustomerByIdNumber(@PathVariable String idNumber) {
         try {
-            Customer customer = customerBL.getCustomerByIdNumber(idNumber);
+            Customer customer = customerService.getCustomerByIdNumber(idNumber);
             return ResponseEntity.ok(customer);
         } catch (Exception e) {
             e.printStackTrace();
@@ -72,7 +71,7 @@ public class CustomerController {
     @GetMapping("/email")
     public ResponseEntity<Customer> getCustomerByEmail(@RequestParam String email) {
         try {
-            Customer customer = customerBL.getCustomerByEmail(email);
+            Customer customer = customerService.getCustomerByEmail(email);
             if (customer != null) {
                 return ResponseEntity.ok(customer);
             } else {
@@ -87,7 +86,7 @@ public class CustomerController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
         try {
-            customerBL.deleteCustomer(id);
+            customerService.deleteCustomer(id);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             e.printStackTrace();
@@ -98,7 +97,7 @@ public class CustomerController {
     @PutMapping("/update")
     public ResponseEntity<Customer> updateCustomerDetails(@RequestBody UserRequest user) {
         try {
-            Customer customer = customerBL.updateCustomerDetails(user);
+            Customer customer = customerService.updateCustomerDetails(user);
             return ResponseEntity.ok(customer);
         } catch (Exception e) {
             e.printStackTrace();

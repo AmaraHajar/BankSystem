@@ -6,12 +6,11 @@ import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import org.solareflare.project.BankSystemMangement.beans.Address;
 import org.solareflare.project.BankSystemMangement.beans.Bank;
-import org.solareflare.project.BankSystemMangement.bl.ForeignCurrencyExchangeBL;
 import org.solareflare.project.BankSystemMangement.dao.AddressDAO;
 import org.solareflare.project.BankSystemMangement.dao.BankDAO;
+import org.solareflare.project.BankSystemMangement.services.ForeignCurrencyExchangeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -41,7 +40,7 @@ public class BankInitializer {
     private  AddressDAO addressDAO;
 
     @Autowired
-    private ForeignCurrencyExchangeBL foreignCurrencyExchangeBL;
+    private ForeignCurrencyExchangeService foreignCurrencyExchangeService;
 
     @PostConstruct
     @Transactional
@@ -66,6 +65,6 @@ public class BankInitializer {
     }
 
     public void fetchDailyExchangeRates() throws Exception {
-        Map<String, Double> rates = foreignCurrencyExchangeBL.getDailyRates();
+        Map<String, Double> rates = foreignCurrencyExchangeService.getDailyRates();
     }
 }

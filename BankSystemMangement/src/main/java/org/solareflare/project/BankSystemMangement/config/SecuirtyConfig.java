@@ -1,11 +1,8 @@
 package org.solareflare.project.BankSystemMangement.config;
 
-
-
-
 import lombok.RequiredArgsConstructor;
-import org.solareflare.project.BankSystemMangement.bl.UserBL;
 import org.solareflare.project.BankSystemMangement.filter.JwtAuthenticationFilter;
+import org.solareflare.project.BankSystemMangement.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,7 +30,7 @@ public class SecuirtyConfig {
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
     @Autowired
-    private UserBL userBL;
+    private UserService userService;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -42,7 +39,7 @@ public class SecuirtyConfig {
     @Bean
     public AuthenticationProvider  authenticationProvider(){
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userBL.userDetailsService());
+        authProvider.setUserDetailsService(userService.userDetailsService());
         authProvider.setPasswordEncoder(passwordEncoder);
         return authProvider;
     }
@@ -61,8 +58,8 @@ public class SecuirtyConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // Use stateless sessions
                 .authorizeRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.GET, "/**").permitAll()  // Allow all GET requests
-                        .requestMatchers(HttpMethod.POST, "/**").permitAll()  // Allow all GET requests
+                        .requestMatchers(HttpMethod.POST,"/authenticate/signup","/authenticate/signin").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/test/**").permitAll()
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -71,7 +68,5 @@ public class SecuirtyConfig {
     }
 
 
-//    .requestMatchers(HttpMethod.POST,"/api/v1/signup","/api/v1/signin","/payments/**","/accounts/**","/customers/**","/loans/**").permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/api/v1/test/**", "/payments","/api/rates/**","/accounts/**","/customers/**","/loans**").permitAll()
 
 }

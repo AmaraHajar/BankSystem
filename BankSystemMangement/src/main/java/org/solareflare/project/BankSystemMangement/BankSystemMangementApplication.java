@@ -12,8 +12,6 @@ public class BankSystemMangementApplication {
     public static void main(String[] args) throws Exception {
         System.out.println("Welcome to Bank Management System");
         ApplicationContext context = SpringApplication.run(BankSystemMangementApplication.class, args);
-        System.out.println("hi");
-        System.out.println("Hello world");
         SystemManager manager = context.getBean(SystemManager.class);
         manager.run();
     }

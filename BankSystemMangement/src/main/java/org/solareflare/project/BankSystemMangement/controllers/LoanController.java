@@ -1,10 +1,10 @@
 package org.solareflare.project.BankSystemMangement.controllers;
 
 import org.solareflare.project.BankSystemMangement.beans.Loan;
-import org.solareflare.project.BankSystemMangement.bl.LoanBL;
 import org.solareflare.project.BankSystemMangement.exceptions.AlreadyExistException;
 import org.solareflare.project.BankSystemMangement.exceptions.LoanNotFoundException;
 import org.solareflare.project.BankSystemMangement.exceptions.NotFoundException;
+import org.solareflare.project.BankSystemMangement.services.LoanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,26 +15,26 @@ import java.util.List;
 public class LoanController {
 
     @Autowired
-    private LoanBL loanBL;
+    private LoanService loanService;
 
 
     @GetMapping("get/all")
     public List<Loan> getAllLoans() {
-        return loanBL.getAllLoans();
+        return loanService.getAllLoans();
     }
 
     @GetMapping("/get/{id}")
     public Loan getLoanById(@PathVariable Long id) throws LoanNotFoundException {
-            return this.loanBL.getLoanById(id);
+            return this.loanService.getLoanById(id);
     }
 
     @PostMapping("/create/loan")
     public Loan createLoan( Loan loan) throws AlreadyExistException, NotFoundException {
-        return this.loanBL.addLoan(loan);
+        return this.loanService.addLoan(loan);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteLoan(@PathVariable Long id) {
-        loanBL.deleteLoan(id);
+    public void deleteLoan(@PathVariable Long id) throws LoanNotFoundException {
+        loanService.deleteLoan(id);
     }
 }
