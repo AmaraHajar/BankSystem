@@ -11,9 +11,6 @@ import java.util.List;
 @Repository
 public interface PaymentDAO extends JpaRepository<Payment, Long> {
 
-//    @Query("SELECT p FROM Payment p WHERE p.account.id = :accountId")
-//    public List<Payment> findPaymentsByAccountId(Long accountId);
-
     public List<Payment> findPaymentByLoanId(Long loanId);
     @Query(value = "SELECT * FROM Payment WHERE MONTH(payment_date) = :month AND YEAR(payment_date) = :year", nativeQuery = true)
     public List<Payment> findPaymentsByMonth(@Param("month") int month, @Param("year") int year);

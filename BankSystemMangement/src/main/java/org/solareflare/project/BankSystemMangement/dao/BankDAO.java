@@ -11,9 +11,6 @@ public interface BankDAO extends JpaRepository<Bank, Long> {
 
     public Bank findByName(String name);
 
-//    // Find banks with more than a certain number of employees
-//    List<Bank> findByEmployeesCountGreaterThan(int count); // there is no variable count in teh class
-
     // Custom query to find all banks with a specific employee
     @Query("SELECT b FROM Bank b JOIN b.employees e WHERE e.id = :employeeId")
     public List<Bank> findBanksByEmployeeId(Long employeeId);

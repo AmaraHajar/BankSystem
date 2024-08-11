@@ -46,7 +46,7 @@ public class EmployeeController {
     }
 
     @PutMapping("/{employeeId}")
-    public ResponseEntity<String> updateEmployee(@PathVariable Long employeeId, @RequestBody Employee employee) throws EmployeeNotValidException {
+    public ResponseEntity<String> updateEmployee(@PathVariable Long employeeId, @RequestBody Employee employee) throws EmployeeNotValidException, NotFoundException {
         employeeService.updateEmployee(employee);
         return ResponseEntity.ok("Employee updated successfully");
     }
@@ -62,16 +62,6 @@ public class EmployeeController {
         employeeService.restrictAccount(accountId);
         return ResponseEntity.ok("Account restricted successfully");
     }
-
-//    @PostMapping("/transfer")
-//    public ResponseEntity<String> transferBetweenAccounts(@RequestParam Long fromAccountId, @RequestParam Long toAccountId, @RequestParam Long amount) {
-//        try {
-//            employeeBL.manageCustomerTransfer(fromAccountId, toAccountId, amount);
-//            return ResponseEntity.ok("Transfer successful");
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-//        }
-//    }
 
     @PostMapping("/transfer/external")
     public ResponseEntity<String> transferToExternal(@RequestParam Long fromAccountId, @RequestParam String externalBankAccountId, @RequestParam Double amount) {

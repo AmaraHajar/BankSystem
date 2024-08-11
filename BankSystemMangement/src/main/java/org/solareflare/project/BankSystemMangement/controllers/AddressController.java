@@ -28,8 +28,6 @@ public class AddressController {
     @GetMapping("/get/{id}")
     public Address getAddressById(@PathVariable Long id) throws NotFoundException {
             return this.addressService.getAddressById(id);
-
-
     }
 
     @DeleteMapping("/{id}")

@@ -15,8 +15,4 @@ public interface CustomerDAO extends JpaRepository<Customer, Long> {
 
     public Customer findByEmail(String email);
 
-//    @Query("SELECT a FROM users a  a.role = 'CUSTOMER'")
-//    public List<Customer> findCustomers();
-
-
 }

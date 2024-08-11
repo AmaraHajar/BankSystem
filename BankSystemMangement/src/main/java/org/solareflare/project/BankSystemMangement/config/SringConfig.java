@@ -18,7 +18,7 @@ public class SringConfig {
 
     @Bean
     public Bank bank() {
-        return new Bank(); // You can provide parameters as needed
+        return new Bank();
     }
 
 }
