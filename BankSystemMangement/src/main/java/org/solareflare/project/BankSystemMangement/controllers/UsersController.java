@@ -1,6 +1,6 @@
 package org.solareflare.project.BankSystemMangement.controllers;
 
-import org.solareflare.project.BankSystemMangement.beans.User;
+import org.solareflare.project.BankSystemMangement.entities.User;
 import org.solareflare.project.BankSystemMangement.dto.SignUpRequest;
 import org.solareflare.project.BankSystemMangement.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

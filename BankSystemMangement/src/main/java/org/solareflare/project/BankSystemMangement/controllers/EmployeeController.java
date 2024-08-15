@@ -1,6 +1,6 @@
 package org.solareflare.project.BankSystemMangement.controllers;
 
-import org.solareflare.project.BankSystemMangement.beans.Employee;
+import org.solareflare.project.BankSystemMangement.entities.Employee;
 import org.solareflare.project.BankSystemMangement.services.EmployeeService;
 import org.solareflare.project.BankSystemMangement.dto.UserRequest;
 import org.solareflare.project.BankSystemMangement.exceptions.*;

@@ -2,11 +2,11 @@ package org.solareflare.project.BankSystemMangement.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.solareflare.project.BankSystemMangement.beans.Employee;
-import org.solareflare.project.BankSystemMangement.dao.UserDAO;
+import org.solareflare.project.BankSystemMangement.entities.Employee;
+import org.solareflare.project.BankSystemMangement.repositories.UserRepository;
 import org.solareflare.project.BankSystemMangement.services.UserService;
-import org.solareflare.project.BankSystemMangement.utils.Position;
-import org.solareflare.project.BankSystemMangement.utils.Role;
+import org.solareflare.project.BankSystemMangement.enums.Position;
+import org.solareflare.project.BankSystemMangement.enums.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 public class SeedDataConfig implements CommandLineRunner {
 
     @Autowired
-    private UserDAO userDAO;
+    private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
@@ -27,7 +27,7 @@ public class SeedDataConfig implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        if (userDAO.count() == 0) {
+        if (userRepository.count() == 0) {
 
             Employee admin = Employee.employeeBuilder()
                     .firstName("admin")

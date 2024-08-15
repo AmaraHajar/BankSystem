@@ -1,6 +1,6 @@
 package org.solareflare.project.BankSystemMangement.controllers;
 
-import org.solareflare.project.BankSystemMangement.beans.Loan;
+import org.solareflare.project.BankSystemMangement.entities.Loan;
 import org.solareflare.project.BankSystemMangement.exceptions.AlreadyExistException;
 import org.solareflare.project.BankSystemMangement.exceptions.LoanNotFoundException;
 import org.solareflare.project.BankSystemMangement.exceptions.NotFoundException;

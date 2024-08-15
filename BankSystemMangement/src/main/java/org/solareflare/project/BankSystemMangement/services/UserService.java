@@ -1,8 +1,8 @@
 package org.solareflare.project.BankSystemMangement.services;
 
-import org.solareflare.project.BankSystemMangement.beans.User;
-import org.solareflare.project.BankSystemMangement.dao.UserDAO;
+import org.solareflare.project.BankSystemMangement.entities.User;
 import org.solareflare.project.BankSystemMangement.exceptions.CustomException;
+import org.solareflare.project.BankSystemMangement.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,20 +11,19 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService {
 
     @Autowired
-    private UserDAO userDAO;
+    private UserRepository userRepository;
 
     // Refactor UserDetailsService to handle exceptions properly
     public UserDetailsService userDetailsService() {
         return new UserDetailsService() {
             @Override
             public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-                UserDetails user = userDAO.findByEmail(username);
+                UserDetails user = userRepository.findByEmail(username);
                 if (user == null) {
                     throw new UsernameNotFoundException("User with email " + username + " not found");
                 }
@@ -39,12 +38,12 @@ public class UserService {
             newUser.setCreatedAt(LocalDateTime.now());
         }
         newUser.setUpdatedAt(LocalDateTime.now());
-        return userDAO.save(newUser);
+        return userRepository.save(newUser);
     }
 
     // Add user with proper exception handling
     public User addUser(User user) throws CustomException {
-        if (user.getId() != null && userDAO.existsById(user.getId())) {
+        if (user.getId() != null && userRepository.existsById(user.getId())) {
             throw new CustomException(User.class, "User with ID already exists: " + user.getId());
         }
         return saveUser(user);
@@ -52,7 +51,7 @@ public class UserService {
 
     // Update user with proper exception handling
     public User updateUser(User user) throws CustomException {
-        if (!userDAO.existsById(user.getId())) {
+        if (!userRepository.existsById(user.getId())) {
             throw new CustomException(User.class, "User not found with ID: " + user.getId());
         }
         return saveUser(user);
@@ -60,7 +59,7 @@ public class UserService {
 
     // Find user by ID number with proper exception handling
     public User findUserByIdNumber(String idNumber) throws CustomException {
-        User user = userDAO.findByIdNumber(idNumber);
+        User user = userRepository.findByIdNumber(idNumber);
         if (user == null) {
             throw new CustomException(User.class, "User not found with ID Number: " + idNumber);
         }
@@ -69,18 +68,18 @@ public class UserService {
 
     // Get all users
     public List<User> getAllUsers() {
-        return userDAO.findAll();
+        return userRepository.findAll();
     }
 
     // Get user by ID with proper exception handling
     public User getUserById(Long id) throws CustomException {
-        return userDAO.findById(id)
+        return userRepository.findById(id)
                 .orElseThrow(() -> new CustomException(User.class, "User not found with ID: " + id));
     }
 
     // Find user by email with proper exception handling
     public User findUserByEmail(String email) throws CustomException {
-        User user = userDAO.findByEmail(email);
+        User user = userRepository.findByEmail(email);
         if (user == null) {
             throw new CustomException(User.class, "User not found with email: " + email);
         }
@@ -93,6 +92,6 @@ public class UserService {
         if (user == null) {
             throw new CustomException(User.class, "User not found with ID: " + id);
         }
-        userDAO.delete(user);
+        userRepository.delete(user);
     }
 }

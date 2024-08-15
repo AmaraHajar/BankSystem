@@ -1,9 +1,7 @@
 package org.solareflare.project.BankSystemMangement.exceptions;
 
 
-import org.solareflare.project.BankSystemMangement.beans.User;
-
-import java.util.Optional;
+import org.solareflare.project.BankSystemMangement.entities.User;
 
 public class UserAlreadyExistException extends Exception {
 

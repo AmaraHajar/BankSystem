@@ -1,12 +1,12 @@
 package org.solareflare.project.BankSystemMangement.services;
 
-import org.solareflare.project.BankSystemMangement.beans.Account;
-import org.solareflare.project.BankSystemMangement.beans.Customer;
-import org.solareflare.project.BankSystemMangement.dao.BankDAO;
-import org.solareflare.project.BankSystemMangement.dao.CustomerDAO;
+import org.solareflare.project.BankSystemMangement.entities.Account;
+import org.solareflare.project.BankSystemMangement.entities.Customer;
+import org.solareflare.project.BankSystemMangement.repositories.BankRepository;
 import org.solareflare.project.BankSystemMangement.dto.UserRequest;
 import org.solareflare.project.BankSystemMangement.exceptions.*;
-import org.solareflare.project.BankSystemMangement.utils.Role;
+import org.solareflare.project.BankSystemMangement.enums.Role;
+import org.solareflare.project.BankSystemMangement.repositories.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,11 +16,12 @@ import java.util.Optional;
 
 @Service
 public class CustomerService {
-    @Autowired
-    private CustomerDAO customerDAO;
 
     @Autowired
-    private BankDAO bankDAO;
+    private CustomerRepository customerRepository;
+
+    @Autowired
+    private BankRepository bankRepository;
 
     @Autowired
     private AccountService accountBL;
@@ -30,7 +31,7 @@ public class CustomerService {
             if (customer.getId() == null) {
                 customer.setRole(Role.ROLE_CUSTOMER);
                 customer.setCreatedAt(LocalDateTime.now());
-                return this.customerDAO.save(customer);
+                return this.customerRepository.save(customer);
             } else {
                 throw new InvalidCustomerOperationException("Customer ID already exists, cannot add customer.");
             }
@@ -43,7 +44,7 @@ public class CustomerService {
         try {
             if (customer.getId() != null) {
                 customer.setUpdatedAt(LocalDateTime.now());
-                return customerDAO.save(customer);
+                return customerRepository.save(customer);
             } else {
                 throw new InvalidCustomerOperationException("Customer ID is null, cannot update customer.");
             }
@@ -60,7 +61,7 @@ public class CustomerService {
                     .password(userRequest.getPassword())
                     .build();
             customer.setUpdatedAt(LocalDateTime.now());
-            return customerDAO.save(customer);
+            return customerRepository.save(customer);
         } catch (Exception e) {
             throw new CustomException(Customer.class, "Failed to update customer details");
         }
@@ -68,7 +69,7 @@ public class CustomerService {
 
     public Customer getCustomerByIdNumber(String idNumber) throws CustomerNotRegisteredException {
         try {
-            Customer customer = customerDAO.findByIdNumber(idNumber);
+            Customer customer = customerRepository.findByIdNumber(idNumber);
             if (customer == null) {
                 throw new CustomerNotRegisteredException();
             }
@@ -82,7 +83,7 @@ public class CustomerService {
 
     public Customer getCustomerByEmail(String email) throws CustomException {
         try {
-            return customerDAO.findByEmail(email);
+            return customerRepository.findByEmail(email);
         } catch (Exception e) {
             throw new CustomException(Customer.class, "Failed to retrieve customer by email");
         }
@@ -90,7 +91,7 @@ public class CustomerService {
 
     public Customer getCustomerById(Long id) throws CustomerNotRegisteredException {
         try {
-            Optional<Customer> customer = this.customerDAO.findById(id);
+            Optional<Customer> customer = this.customerRepository.findById(id);
             if (customer.isPresent()) {
                 return customer.get();
             } else {
@@ -105,7 +106,7 @@ public class CustomerService {
 
     public List<Customer> getAllCustomers() throws CustomException {
         try {
-            return this.customerDAO.findAll();
+            return this.customerRepository.findAll();
         } catch (Exception e) {
             throw new CustomException(Customer.class, "Failed to retrieve all customers");
         }
@@ -113,7 +114,7 @@ public class CustomerService {
 
     public void deleteCustomer(Long id) throws CustomException {
         try {
-            customerDAO.deleteById(id);
+            customerRepository.deleteById(id);
         } catch (Exception e) {
             throw new CustomException(Customer.class, "Failed to delete customer");
         }

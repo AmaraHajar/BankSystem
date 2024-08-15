@@ -1,6 +1,6 @@
 package org.solareflare.project.BankSystemMangement.controllers;
 
-import org.solareflare.project.BankSystemMangement.beans.Customer;
+import org.solareflare.project.BankSystemMangement.entities.Customer;
 import org.solareflare.project.BankSystemMangement.services.AuthenticationService;
 import org.solareflare.project.BankSystemMangement.dto.JwtAuthenticationResponse;
 import org.solareflare.project.BankSystemMangement.dto.SignUpRequest;

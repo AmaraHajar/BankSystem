@@ -1,7 +1,7 @@
 package org.solareflare.project.BankSystemMangement.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.solareflare.project.BankSystemMangement.beans.ForeignCurrencyExchange;
+import org.solareflare.project.BankSystemMangement.entities.ForeignCurrencyExchange;
 import org.solareflare.project.BankSystemMangement.dto.ForexDetails;
 import org.solareflare.project.BankSystemMangement.exceptions.ForeignCurrencyExchangeNotFoundException;
 import org.solareflare.project.BankSystemMangement.services.ForeignCurrencyExchangeService;

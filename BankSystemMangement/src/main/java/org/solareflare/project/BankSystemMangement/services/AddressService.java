@@ -1,9 +1,8 @@
 package org.solareflare.project.BankSystemMangement.services;
 
-import org.solareflare.project.BankSystemMangement.beans.Address;
-import org.solareflare.project.BankSystemMangement.dao.AddressDAO;
+import org.solareflare.project.BankSystemMangement.entities.Address;
+import org.solareflare.project.BankSystemMangement.repositories.AddressRepository;
 import org.solareflare.project.BankSystemMangement.exceptions.*;
-import org.solareflare.project.BankSystemMangement.utils.Validation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +13,7 @@ import java.util.Optional;
 public class AddressService {
 
     @Autowired
-    private AddressDAO addressDAO;
+    private AddressRepository addressDAO;
 
     public List<Address> getAllAddresses() {
         try {

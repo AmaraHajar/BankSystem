@@ -1,11 +1,10 @@
 package org.solareflare.project.BankSystemMangement.services;
 
-import org.solareflare.project.BankSystemMangement.beans.*;
-import org.solareflare.project.BankSystemMangement.dao.*;
+import org.solareflare.project.BankSystemMangement.entities.*;
 import org.solareflare.project.BankSystemMangement.exceptions.*;
-import org.solareflare.project.BankSystemMangement.utils.NotificationMessage;
-import org.solareflare.project.BankSystemMangement.utils.StatusInSystem;
-import org.solareflare.project.BankSystemMangement.utils.TransactionType;
+import org.solareflare.project.BankSystemMangement.enums.StatusInSystem;
+import org.solareflare.project.BankSystemMangement.enums.TransactionType;
+import org.solareflare.project.BankSystemMangement.repositories.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +16,7 @@ import java.util.*;
 public class AccountService {
 
     @Autowired
-    private AccountDAO accountDAO;
+    private AccountRepository accountRepository;
 
     @Autowired
     private NotificationService notifyService;
@@ -28,13 +27,13 @@ public class AccountService {
     public Account addAccount(Account account) throws AccountAlreadyExistException, AccountNotValidException, CustomerNotRegisteredException, CustomerNotValidException {
         if (account == null) throw new AccountNotValidException();
 
-        if (account.getId() != null && this.accountDAO.existsById(account.getId())) {
+        if (account.getId() != null && this.accountRepository.existsById(account.getId())) {
             throw new AccountAlreadyExistException(account);
         }
 
         try {
             System.out.println("Adding account " + account);
-            return this.accountDAO.save(account);
+            return this.accountRepository.save(account);
         } catch (Exception e) {
             throw new CustomException(Account.class, "Failed to add account");
         }
@@ -42,7 +41,7 @@ public class AccountService {
 
     public Account getAccountById(Long id) {
         try {
-            Optional<Account> account = this.accountDAO.findById(id);
+            Optional<Account> account = this.accountRepository.findById(id);
             return account.orElseThrow(() -> new CustomException(Account.class, "Account Not Found"));
         } catch (Exception e) {
             throw new CustomException(Account.class, "Failed to retrieve account");
@@ -51,7 +50,7 @@ public class AccountService {
 
     public List<Account> getAllAccounts() {
         try {
-            return this.accountDAO.findAll();
+            return this.accountRepository.findAll();
         } catch (Exception e) {
             throw new CustomException(Account.class, "Failed to retrieve accounts");
         }
@@ -59,7 +58,7 @@ public class AccountService {
 
     public Account updateAccount(Account account) {
         try {
-            return accountDAO.save(account);
+            return accountRepository.save(account);
         } catch (Exception e) {
             throw new CustomException(Account.class, "Failed to update account");
         }
@@ -67,7 +66,7 @@ public class AccountService {
 
     public void deleteAccount(Long id) {
         try {
-            this.accountDAO.deleteById(id);
+            this.accountRepository.deleteById(id);
         } catch (Exception e) {
             throw new CustomException(Account.class, "Failed to delete account");
         }
@@ -75,7 +74,7 @@ public class AccountService {
 
     public BigDecimal getAccountBalance(Long accountId) throws AccountNotFoundException {
         try {
-            Account account = accountDAO.findById(accountId).orElseThrow(AccountNotFoundException::new);
+            Account account = accountRepository.findById(accountId).orElseThrow(AccountNotFoundException::new);
             return account.getBalance();
         } catch (AccountNotFoundException e) {
             throw e;
@@ -86,17 +85,17 @@ public class AccountService {
 
     public void updateAccountStatus(Long accountId) throws AccountNotFoundException {
         try {
-            Account account = accountDAO.findById(accountId).orElseThrow(() -> new AccountNotFoundException(accountId + ""));
+            Account account = accountRepository.findById(accountId).orElseThrow(() -> new AccountNotFoundException(accountId + ""));
             if (account.getBalance().compareTo(BigDecimal.ZERO) < 0) {
                 account.setStatus(StatusInSystem.IRREGULAR);
-                Customer customer = accountDAO.findCustomerById(accountId);
+                Customer customer = accountRepository.findCustomerById(accountId);
                 String name = customer.getFirstName() + " " + customer.getLastName();
                 String msg = "Dear " + name + ",\n\nYour account is overdrawn. " +
                         "Please take immediate action to resolve this issue.\n\nBest regards,\nYour Bank";
 
-                NotificationMessage.notifyMessage(customer.getEmail().toString(), "ACCOUNT STATUS", msg);
+               ///TO DO Notify customer
             }
-            accountDAO.save(account);
+            accountRepository.save(account);
         } catch (AccountNotFoundException e) {
             throw e;
         } catch (Exception e) {
@@ -106,9 +105,9 @@ public class AccountService {
 
     public void suspendAccount(Long accountId) throws AccountNotFoundException {
         try {
-            Account account = accountDAO.findById(accountId).orElseThrow(AccountNotFoundException::new);
+            Account account = accountRepository.findById(accountId).orElseThrow(AccountNotFoundException::new);
             account.setStatus(StatusInSystem.SUSPENDED);
-            accountDAO.save(account);
+            accountRepository.save(account);
         } catch (AccountNotFoundException e) {
             throw e;
         } catch (Exception e) {
@@ -118,9 +117,9 @@ public class AccountService {
 
     public void restrictAccount(Long accountId) throws AccountNotFoundException {
         try {
-            Account account = accountDAO.findById(accountId).orElseThrow(AccountNotFoundException::new);
+            Account account = accountRepository.findById(accountId).orElseThrow(AccountNotFoundException::new);
             account.setStatus(StatusInSystem.RESTRICTED);
-            accountDAO.save(account);
+            accountRepository.save(account);
         } catch (AccountNotFoundException e) {
             throw e;
         } catch (Exception e) {
@@ -130,7 +129,7 @@ public class AccountService {
 
     public Account deposit(Long accountId, Double amount) throws Exception {
         try {
-            Account account = accountDAO.findAccountById(accountId);
+            Account account = accountRepository.findAccountById(accountId);
             account.setBalance(account.getBalance().add(new BigDecimal(amount)));
             updateAccount(account);
 
@@ -147,7 +146,7 @@ public class AccountService {
 
     public Account withdraw(Long accountId, Double amount) throws Exception {
         try {
-            Account account = accountDAO.findAccountById(accountId);
+            Account account = accountRepository.findAccountById(accountId);
             if (account == null) {
                 throw new AccountNotFoundException("Account not found");
             }
@@ -172,8 +171,8 @@ public class AccountService {
 
     public void transfer(Long fromAccountId, Long toAccountId, Double amount) throws Exception {
         try {
-            Account fromAccount = accountDAO.findAccountById(fromAccountId);
-            Account toAccount = accountDAO.findAccountById(toAccountId);
+            Account fromAccount = accountRepository.findAccountById(fromAccountId);
+            Account toAccount = accountRepository.findAccountById(toAccountId);
 
             if (fromAccount == null || toAccount == null) {
                 throw new CustomException(Account.class, "One or both accounts not found");

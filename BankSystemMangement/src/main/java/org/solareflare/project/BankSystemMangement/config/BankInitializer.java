@@ -1,13 +1,11 @@
 package org.solareflare.project.BankSystemMangement.config;
 
-
-
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
-import org.solareflare.project.BankSystemMangement.beans.Address;
-import org.solareflare.project.BankSystemMangement.beans.Bank;
-import org.solareflare.project.BankSystemMangement.dao.AddressDAO;
-import org.solareflare.project.BankSystemMangement.dao.BankDAO;
+import org.solareflare.project.BankSystemMangement.entities.Address;
+import org.solareflare.project.BankSystemMangement.entities.Bank;
+import org.solareflare.project.BankSystemMangement.repositories.AddressRepository;
+import org.solareflare.project.BankSystemMangement.repositories.BankRepository;
 import org.solareflare.project.BankSystemMangement.services.ForeignCurrencyExchangeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,10 +32,10 @@ public class BankInitializer {
     private String bankState;
 
     @Autowired
-    private  BankDAO bankDAO;
+    private BankRepository bankRepository;
 
     @Autowired
-    private  AddressDAO addressDAO;
+    private AddressRepository addressDAO;
 
     @Autowired
     private ForeignCurrencyExchangeService foreignCurrencyExchangeService;
@@ -53,11 +51,11 @@ public class BankInitializer {
                 .state(this.bankState)
                 .build();
 
-        if (bankDAO.findByName(bankName) == null) {
+        if (bankRepository.findByName(bankName) == null) {
             Bank bank = new Bank();
             bank.setName(bankName);
             bank.setAddress(address);
-            bankDAO.save(bank);
+            bankRepository.save(bank);
         }
 
         fetchDailyExchangeRates();

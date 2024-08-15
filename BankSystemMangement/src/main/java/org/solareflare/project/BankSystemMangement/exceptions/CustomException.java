@@ -1,8 +1,6 @@
 package org.solareflare.project.BankSystemMangement.exceptions;
 
 
-import org.solareflare.project.BankSystemMangement.beans.Customer;
-
 public class CustomException extends RuntimeException {
     private final String typeName;
     private final String message;

@@ -1,6 +1,6 @@
 package org.solareflare.project.BankSystemMangement.controllers;
 
-import org.solareflare.project.BankSystemMangement.beans.Address;
+import org.solareflare.project.BankSystemMangement.entities.Address;
 import org.solareflare.project.BankSystemMangement.exceptions.NotFoundException;
 import org.solareflare.project.BankSystemMangement.services.AddressService;
 import org.springframework.beans.factory.annotation.Autowired;

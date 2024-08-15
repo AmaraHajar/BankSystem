@@ -1,9 +1,9 @@
 package org.solareflare.project.BankSystemMangement.services;
 
-import org.solareflare.project.BankSystemMangement.beans.*;
-import org.solareflare.project.BankSystemMangement.dao.BankDAO;
+import org.solareflare.project.BankSystemMangement.entities.*;
+import org.solareflare.project.BankSystemMangement.repositories.BankRepository;
+import org.solareflare.project.BankSystemMangement.enums.ActionStatus;
 import org.solareflare.project.BankSystemMangement.exceptions.*;
-import org.solareflare.project.BankSystemMangement.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +16,7 @@ import java.util.Objects;
 public class BankService {
 
     @Autowired
-    private BankDAO bankDAO;
+    private BankRepository bankRepository;
 
     @Autowired
     private EmployeeService employeeService;
@@ -38,7 +38,7 @@ public class BankService {
 
     public List<Bank> getBank() {
         try {
-            return this.bankDAO.findAll();
+            return this.bankRepository.findAll();
         } catch (Exception e) {
             throw new CustomException(Bank.class, "Failed to retrieve banks");
         }
@@ -47,7 +47,7 @@ public class BankService {
     public Bank getByName(String name) {
         Bank bank;
         try {
-            bank = bankDAO.findByName(name);
+            bank = bankRepository.findByName(name);
             return bank;
         } catch (Exception e) {
             throw new CustomException(Bank.class, "Failed to retrieve bank by name");
@@ -56,7 +56,7 @@ public class BankService {
 
     public void updateBankBalance(Bank bank) {
         try {
-            bankDAO.save(bank);
+            bankRepository.save(bank);
         } catch (Exception e) {
             throw new CustomException(Bank.class, "Failed to update bank balance");
         }
@@ -65,11 +65,11 @@ public class BankService {
     public Bank registerBank(Bank bank) throws AlreadyExistException {
         Bank currentBank;
         try{
-            currentBank = bankDAO.findByName(bank.getName());
+            currentBank = bankRepository.findByName(bank.getName());
         }catch (Exception e){
             throw  new AlreadyExistException(bank);
         }
-        return this.bankDAO.save(bank);
+        return this.bankRepository.save(bank);
     }
 
     public List<Employee> getEmployees() {

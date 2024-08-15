@@ -1,6 +1,6 @@
 package org.solareflare.project.BankSystemMangement.controllers;
 
-import org.solareflare.project.BankSystemMangement.beans.*;
+import org.solareflare.project.BankSystemMangement.entities.*;
 import org.solareflare.project.BankSystemMangement.services.AccountService;
 import org.solareflare.project.BankSystemMangement.exceptions.*;
 import org.solareflare.project.BankSystemMangement.services.CustomerService;

@@ -1,15 +1,15 @@
 package org.solareflare.project.BankSystemMangement.services;
 
-import org.solareflare.project.BankSystemMangement.beans.Account;
-import org.solareflare.project.BankSystemMangement.beans.Transaction;
-import org.solareflare.project.BankSystemMangement.dao.AccountDAO;
-import org.solareflare.project.BankSystemMangement.dao.TransactionDAO;
+import org.solareflare.project.BankSystemMangement.entities.Account;
+import org.solareflare.project.BankSystemMangement.entities.Transaction;
+import org.solareflare.project.BankSystemMangement.repositories.AccountRepository;
 import org.solareflare.project.BankSystemMangement.dto.TransferRequest;
 import org.solareflare.project.BankSystemMangement.exceptions.InsufficientFundsException;
 import org.solareflare.project.BankSystemMangement.exceptions.InvalidAccountException;
 import org.solareflare.project.BankSystemMangement.exceptions.TransactionNotFoundException;
-import org.solareflare.project.BankSystemMangement.utils.ActionStatus;
-import org.solareflare.project.BankSystemMangement.utils.TransactionType;
+import org.solareflare.project.BankSystemMangement.enums.ActionStatus;
+import org.solareflare.project.BankSystemMangement.enums.TransactionType;
+import org.solareflare.project.BankSystemMangement.repositories.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,10 +23,10 @@ import java.util.Optional;
 public class TransactionService {
 
     @Autowired
-    private TransactionDAO transactionDao;
+    private TransactionRepository transactionRepository;
 
     @Autowired
-    private AccountDAO accountDAO;
+    private AccountRepository accountRepository;
 
     public Transaction addTransaction(TransactionType transactionType, Double amount, Account fromAccount, Account toAccount) throws Exception {
         try {
@@ -45,11 +45,11 @@ public class TransactionService {
     }
 
     public List<Transaction> getAllTransactions() {
-        return transactionDao.findAll();
+        return transactionRepository.findAll();
     }
 
     public Transaction getTransactionById(Long id) throws TransactionNotFoundException {
-        Optional<Transaction> transaction = this.transactionDao.findById(id);
+        Optional<Transaction> transaction = this.transactionRepository.findById(id);
         if (transaction.isPresent()) {
             return transaction.get();
         }
@@ -60,15 +60,15 @@ public class TransactionService {
 
 
     public Transaction saveTransaction(Transaction transaction) {
-        return transactionDao.save(transaction);
+        return transactionRepository.save(transaction);
     }
 
     public void deleteTransaction(Long id) {
-        transactionDao.deleteById(id);
+        transactionRepository.deleteById(id);
     }
 
     public List<Transaction> getTransactionsByAccountId(Long accountId) {
-        return transactionDao.findTransactionsByAccountId(accountId);
+        return transactionRepository.findTransactionsByAccountId(accountId);
     }
 
     public Transaction requestTransaction(Transaction transaction){
@@ -103,9 +103,9 @@ public class TransactionService {
 //    }
 
     public void transferFunds(TransferRequest transferRequest) throws AccountNotFoundException, InsufficientFundsException, InvalidAccountException {
-        Account senderAccount = accountDAO.findById(transferRequest.getSenderAccountId())
+        Account senderAccount = accountRepository.findById(transferRequest.getSenderAccountId())
                 .orElseThrow(() -> new AccountNotFoundException("Sender account not found for ID: " + transferRequest.getSenderAccountId()));
-        Account recipientAccount = accountDAO.findById(transferRequest.getRecipientAccountId())
+        Account recipientAccount = accountRepository.findById(transferRequest.getRecipientAccountId())
                 .orElseThrow(() -> new AccountNotFoundException("Recipient account not found for ID: " + transferRequest.getRecipientAccountId()));
 
         if (senderAccount.equals(recipientAccount)) {
@@ -123,8 +123,8 @@ public class TransactionService {
         recipientAccount.setBalance(recipientAccount.getBalance().add(new BigDecimal(transferRequest.getAmount())));
 
         // Save the updated accounts
-        accountDAO.save(senderAccount);
-        accountDAO.save(recipientAccount);
+        accountRepository.save(senderAccount);
+        accountRepository.save(recipientAccount);
 
         // Optionally, create a transaction record here
     }

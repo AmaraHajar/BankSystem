@@ -1,6 +1,6 @@
 package org.solareflare.project.BankSystemMangement.exceptions;
 
-import org.solareflare.project.BankSystemMangement.beans.Payment;
+import org.solareflare.project.BankSystemMangement.entities.Payment;
 
 public class PaymentAlreadyExistsException extends Throwable {
 

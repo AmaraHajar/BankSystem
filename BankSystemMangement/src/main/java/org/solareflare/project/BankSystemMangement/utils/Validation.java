@@ -1,6 +1,7 @@
 package org.solareflare.project.BankSystemMangement.utils;
 
-import org.solareflare.project.BankSystemMangement.beans.Address;
+import org.solareflare.project.BankSystemMangement.constants.Patterns;
+import org.solareflare.project.BankSystemMangement.entities.Address;
 import org.solareflare.project.BankSystemMangement.exceptions.InvalidAddressException;
 import org.solareflare.project.BankSystemMangement.exceptions.InvalidEmailException;
 import org.solareflare.project.BankSystemMangement.exceptions.InvalidIdException;

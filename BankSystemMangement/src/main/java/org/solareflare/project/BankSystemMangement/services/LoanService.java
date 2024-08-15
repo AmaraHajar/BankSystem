@@ -1,12 +1,12 @@
 package org.solareflare.project.BankSystemMangement.services;
 
-import org.solareflare.project.BankSystemMangement.beans.Customer;
-import org.solareflare.project.BankSystemMangement.beans.Loan;
-import org.solareflare.project.BankSystemMangement.beans.Payment;
-import org.solareflare.project.BankSystemMangement.dao.AccountDAO;
-import org.solareflare.project.BankSystemMangement.dao.LoanDAO;
+import org.solareflare.project.BankSystemMangement.entities.Customer;
+import org.solareflare.project.BankSystemMangement.entities.Loan;
+import org.solareflare.project.BankSystemMangement.entities.Payment;
+import org.solareflare.project.BankSystemMangement.repositories.AccountRepository;
 import org.solareflare.project.BankSystemMangement.exceptions.*;
-import org.solareflare.project.BankSystemMangement.utils.ActionStatus;
+import org.solareflare.project.BankSystemMangement.enums.ActionStatus;
+import org.solareflare.project.BankSystemMangement.repositories.LoanRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,10 +19,10 @@ import java.util.Optional;
 public class LoanService {
 
     @Autowired
-    private LoanDAO loanDAO;
+    private LoanRepository loanRepository;
 
     @Autowired
-    private AccountDAO accountDAO;
+    private AccountRepository accountRepository;
 
     @Autowired
     private PaymentService paymentService;
@@ -33,7 +33,7 @@ public class LoanService {
     public Loan addLoan(Loan loan) throws AlreadyExistException, NotFoundException {
         try {
             if (loan.getId() != null) {
-                Optional<Loan> existingLoan = loanDAO.findById(loan.getId());
+                Optional<Loan> existingLoan = loanRepository.findById(loan.getId());
                 if (existingLoan.isPresent()) {
                     throw new AlreadyExistException("Loan already exists with ID: " + loan.getId());
                 }
@@ -68,7 +68,7 @@ public class LoanService {
 
     public Loan updateLoan(Loan loan) throws LoanNotFoundException {
         try {
-            Optional<Loan> existingLoan = this.loanDAO.findById(loan.getId());
+            Optional<Loan> existingLoan = this.loanRepository.findById(loan.getId());
             if (existingLoan.isEmpty()) {
                 throw new LoanNotFoundException("Loan not found with ID: " + loan.getId());
             }
@@ -80,20 +80,20 @@ public class LoanService {
 
     public Loan saveLoan(Loan loan) throws CustomException {
         try {
-            return loanDAO.save(loan);
+            return loanRepository.save(loan);
         } catch (Exception e) {
             throw new CustomException(Loan.class, "Failed to save loan: " + e.getMessage());
         }
     }
 
     public Loan getLoanById(Long id) throws LoanNotFoundException {
-        return loanDAO.findById(id)
+        return loanRepository.findById(id)
                 .orElseThrow(() -> new LoanNotFoundException("Loan not found with ID: " + id));
     }
 
     public List<Loan> getAllLoans() throws CustomException {
         try {
-            return loanDAO.findAll();
+            return loanRepository.findAll();
         } catch (Exception e) {
             throw new CustomException(Loan.class, "Failed to retrieve all loans: " + e.getMessage());
         }
@@ -101,10 +101,10 @@ public class LoanService {
 
     public void deleteLoan(Long id) throws LoanNotFoundException, CustomException {
         try {
-            if (!loanDAO.existsById(id)) {
+            if (!loanRepository.existsById(id)) {
                 throw new LoanNotFoundException("Loan not found with ID: " + id);
             }
-            loanDAO.deleteById(id);
+            loanRepository.deleteById(id);
         } catch (Exception e) {
             throw new CustomException(Loan.class, "Failed to delete loan: " + e.getMessage());
         }
@@ -113,7 +113,7 @@ public class LoanService {
     public Loan grantLoan(Long accountId, Double amount, Instant startDate, Instant dueDate) throws AlreadyExistException, NotFoundException {
         try {
             Loan loan = Loan.builder()
-                    .account(accountDAO.findAccountById(accountId))
+                    .account(accountRepository.findAccountById(accountId))
                     .amount(amount)
                     .startDate(startDate)
                     .dueDate(dueDate)

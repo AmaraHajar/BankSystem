@@ -1,12 +1,11 @@
 package org.solareflare.project.BankSystemMangement.services;
 
-import org.solareflare.project.BankSystemMangement.beans.Loan;
-import org.solareflare.project.BankSystemMangement.beans.Payment;
-import org.solareflare.project.BankSystemMangement.dao.LoanDAO;
-import org.solareflare.project.BankSystemMangement.dao.PaymentDAO;
+import org.solareflare.project.BankSystemMangement.entities.Loan;
+import org.solareflare.project.BankSystemMangement.entities.Payment;
+import org.solareflare.project.BankSystemMangement.repositories.LoanRepository;
 import org.solareflare.project.BankSystemMangement.exceptions.*;
-import org.solareflare.project.BankSystemMangement.utils.ActionStatus;
-import org.solareflare.project.BankSystemMangement.utils.NotificationMessage;
+import org.solareflare.project.BankSystemMangement.enums.ActionStatus;
+import org.solareflare.project.BankSystemMangement.repositories.PaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,16 +17,19 @@ import java.util.Optional;
 public class PaymentService {
 
     @Autowired
-    private PaymentDAO paymentDAO;
+    private PaymentRepository paymentRepository;
 
     @Autowired
-    private LoanDAO loanDAO;
+    private LoanRepository loanRepository;
+
+    @Autowired
+    private NotificationService notificationService;
 
 
     public Payment addPayment(Payment payment) throws AlreadyExistException, NotFoundException {
         try {
             if (payment.getId() != null) {
-                Optional<Loan> existingLoan = this.loanDAO.findById(payment.getLoan().getId());
+                Optional<Loan> existingLoan = this.loanRepository.findById(payment.getLoan().getId());
                 if (existingLoan.isPresent()) {
                     throw new AlreadyExistException("Payment with this ID already exists.");
                 }
@@ -47,7 +49,7 @@ public class PaymentService {
 
     public Payment getPaymentById(Long id) throws PaymentNotFoundException {
         try{
-            Optional<Payment> payment = this.paymentDAO.findById(id);
+            Optional<Payment> payment = this.paymentRepository.findById(id);
                 return payment.get();
         }catch (Exception e){
             throw new PaymentNotFoundException("Payment not found for ID: " + id,e);
@@ -56,28 +58,28 @@ public class PaymentService {
 
 
     public List<Payment> getPaymentsByLoan(Loan loan) throws PaymentNotFoundException {
-        return this.paymentDAO.findPaymentByLoanId(loan.getId());
+        return this.paymentRepository.findPaymentByLoanId(loan.getId());
     }
 
     public List<Payment> getPaymentsByMonth(int month, int year){
-        return paymentDAO.findPaymentsByMonth(month,year);
+        return paymentRepository.findPaymentsByMonth(month,year);
     }
 
     public List<Payment> getAllPayments() {
-        return paymentDAO.findAll();
+        return paymentRepository.findAll();
     }
 
     public Payment savePayment(Payment payment) {
-        return paymentDAO.save(payment);
+        return paymentRepository.save(payment);
     }
 
     public Integer getPaymentsNumberByLoanId(Long loanId){
-        return paymentDAO.findPaymentByLoanId(loanId).size();
+        return paymentRepository.findPaymentByLoanId(loanId).size();
     }
 
     public List<Payment> getPaymentsByLoanId(Long loanId) throws PaymentNotFoundException {
         try {
-            return this.paymentDAO.findPaymentByLoanId(loanId);
+            return this.paymentRepository.findPaymentByLoanId(loanId);
         } catch (Exception e) {
             throw new PaymentNotFoundException("Payments not found for Loan ID: " + loanId, e);
         }
@@ -85,15 +87,15 @@ public class PaymentService {
 
 
     public void deletePayment(Long id) {
-        paymentDAO.deleteById(id);
+        paymentRepository.deleteById(id);
     }
 
     public void followUpOnUnpaidLoans() {
         try {
-            List<Loan> unpaidLoans = loanDAO.findByIsPaidFalse();
+            List<Loan> unpaidLoans = loanRepository.findByIsPaidFalse();
             unpaidLoans.forEach(loan -> {
                 if (loan.getDueDate().isBefore(Instant.now())) {
-                    NotificationMessage.notifyMessage(
+                   notificationService.sendEmail(
                             loan.getAccount().getCustomer().getEmail(),
                             "Loan Payment Status",
                             "Your loan payment is overdue."
@@ -110,7 +112,7 @@ public class PaymentService {
         try {
             payment.setStatus(ActionStatus.PENDING);
             payment.setDate(Instant.now());
-            return paymentDAO.save(payment);
+            return paymentRepository.save(payment);
         } catch (Exception e) {
             throw new RuntimeException("Failed to request payment for Payment ID: " + payment.getId(), e);
         }

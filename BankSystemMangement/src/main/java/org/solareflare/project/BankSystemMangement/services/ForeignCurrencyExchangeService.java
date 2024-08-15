@@ -1,10 +1,10 @@
 package org.solareflare.project.BankSystemMangement.services;
 
-import org.solareflare.project.BankSystemMangement.beans.Account;
-import org.solareflare.project.BankSystemMangement.beans.Bank;
-import org.solareflare.project.BankSystemMangement.beans.ForeignCurrencyExchange;
-import org.solareflare.project.BankSystemMangement.dao.BankDAO;
-import org.solareflare.project.BankSystemMangement.dao.ForeignCurrencyExchangeDAO;
+import org.solareflare.project.BankSystemMangement.entities.Account;
+import org.solareflare.project.BankSystemMangement.entities.Bank;
+import org.solareflare.project.BankSystemMangement.entities.ForeignCurrencyExchange;
+import org.solareflare.project.BankSystemMangement.repositories.BankRepository;
+import org.solareflare.project.BankSystemMangement.repositories.ForeignCurrencyExchangeRepository;
 import org.solareflare.project.BankSystemMangement.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,13 +22,13 @@ import java.util.Optional;
 public class ForeignCurrencyExchangeService {
 
     @Autowired
-    private ForeignCurrencyExchangeDAO forexDAO;
+    private ForeignCurrencyExchangeRepository  forexRepository;
 
     @Autowired
     private AccountService accountBL;
 
     @Autowired
-    private BankDAO bankDAO;
+    private BankRepository bankRepository;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -69,30 +69,29 @@ public class ForeignCurrencyExchangeService {
 
     public List<ForeignCurrencyExchange> getAllForex() throws CustomException {
         try {
-            return forexDAO.findAll();
+            return forexRepository.findAll();
         } catch (Exception e) {
             throw new CustomException(ForeignCurrencyExchange.class, "Failed to retrieve all foreign exchanges");
         }
     }
 
     public ForeignCurrencyExchange getForexById(Long id) throws ForeignCurrencyExchangeNotFoundException {
-        return forexDAO.findById(id)
+        return forexRepository.findById(id)
                 .orElseThrow(() -> new ForeignCurrencyExchangeNotFoundException("Foreign Currency Exchange not found for id: " + id));
     }
 
     public ForeignCurrencyExchange getForexByName(String name) throws ForeignCurrencyExchangeNotFoundException {
-        return forexDAO.findByName(name)
+        return forexRepository.findByName(name)
                 .orElseThrow(() -> new ForeignCurrencyExchangeNotFoundException("Foreign Currency Exchange not found for name: " + name));
     }
 
     public ForeignCurrencyExchange addForex(String name, Double rate) throws Exception {
         try {
-            Optional<ForeignCurrencyExchange> existingForex = forexDAO.findByName(name);
+            Optional<ForeignCurrencyExchange> existingForex = forexRepository.findByName(name);
             if (existingForex.isPresent()) {
                 return updateForex(name, rate);
             }
-            ForeignCurrencyExchange forex = new ForeignCurrencyExchange();
-            forex.setName(name);
+            ForeignCurrencyExchange forex = ForeignCurrencyExchange.builder().name(name).build();
             return addOrEditDetails(forex, rate);
         } catch (Exception e) {
             throw new CustomException(ForeignCurrencyExchange.class, "Failed to add forex: " + e.getMessage());
@@ -120,7 +119,7 @@ public class ForeignCurrencyExchangeService {
 
     public ForeignCurrencyExchange saveForex(ForeignCurrencyExchange forex) throws CustomException {
         try {
-            return forexDAO.save(forex);
+            return forexRepository.save(forex);
         } catch (Exception e) {
             throw new CustomException(ForeignCurrencyExchange.class, "Failed to save forex: " + e.getMessage());
         }
@@ -129,7 +128,7 @@ public class ForeignCurrencyExchangeService {
     public void deleteForexById(Long id) throws ForeignCurrencyExchangeNotFoundException, CustomException {
         try {
             ForeignCurrencyExchange forex = this.getForexById(id);
-            forexDAO.delete(forex);
+            forexRepository.delete(forex);
         } catch (Exception e) {
             throw new CustomException(ForeignCurrencyExchange.class, "Failed to delete forex by ID: " + e.getMessage());
         }
@@ -138,7 +137,7 @@ public class ForeignCurrencyExchangeService {
     public void deleteForexByName(String name) throws ForeignCurrencyExchangeNotFoundException, CustomException {
         try {
             ForeignCurrencyExchange forex = this.getForexByName(name);
-            forexDAO.delete(forex);
+            forexRepository.delete(forex);
         } catch (Exception e) {
             throw new CustomException(ForeignCurrencyExchange.class, "Failed to delete forex by name: " + e.getMessage());
         }
@@ -146,20 +145,20 @@ public class ForeignCurrencyExchangeService {
 
     public void deleteAllForex() throws CustomException {
         try {
-            forexDAO.deleteAll();
+            forexRepository.deleteAll();
         } catch (Exception e) {
             throw new CustomException(ForeignCurrencyExchange.class, "Failed to delete all forex records: " + e.getMessage());
         }
     }
 
     private Bank getBank() throws BankNotFoundException {
-        return bankDAO.findById(1L)
+        return bankRepository.findById(1L)
                 .orElseThrow(() -> new BankNotFoundException("Bank not found"));
     }
 
     public long countAllForex() throws CustomException {
         try {
-            return forexDAO.count();
+            return forexRepository.count();
         } catch (Exception e) {
             throw new CustomException(ForeignCurrencyExchange.class, "Failed to count all forex records: " + e.getMessage());
         }
@@ -193,7 +192,7 @@ public class ForeignCurrencyExchangeService {
             // Retrieve the bank and update its balance
             Bank bank = getBank();
             bank.setBalance(bank.getBalance().add(BigDecimal.valueOf(amountInILS)));
-            bankDAO.save(bank);
+            bankRepository.save(bank);
         } catch (Exception e) {
             throw new CustomException(ForeignCurrencyExchange.class, "Failed to process forex transaction: " + e.getMessage());
         }

@@ -1,8 +1,5 @@
 package org.solareflare.project.BankSystemMangement.config;
 
-
-
-
 import org.solareflare.project.BankSystemMangement.services.*;
 import org.solareflare.project.BankSystemMangement.exceptions.LoanNotFoundException;
 import org.solareflare.project.BankSystemMangement.exceptions.NotFoundException;

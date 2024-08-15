@@ -1,10 +1,10 @@
 package org.solareflare.project.BankSystemMangement.services;
 
-import org.solareflare.project.BankSystemMangement.beans.*;
-import org.solareflare.project.BankSystemMangement.dao.AccountDAO;
-import org.solareflare.project.BankSystemMangement.dao.EmployeeDAO;
+import org.solareflare.project.BankSystemMangement.entities.*;
+import org.solareflare.project.BankSystemMangement.repositories.AccountRepository;
 import org.solareflare.project.BankSystemMangement.exceptions.*;
-import org.solareflare.project.BankSystemMangement.utils.StatusInSystem;
+import org.solareflare.project.BankSystemMangement.enums.StatusInSystem;
+import org.solareflare.project.BankSystemMangement.repositories.EmployeeRepository;
 import org.solareflare.project.BankSystemMangement.utils.Validation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,16 +17,16 @@ import java.util.Optional;
 public class EmployeeService {
 
     @Autowired
-    private EmployeeDAO employeeDAO;
+    private EmployeeRepository employeeRepository;
 
     @Autowired
-    private AccountDAO accountDAO;
+    private AccountRepository accountRepository;
 
     @Autowired
     private AccountService accountService;
 
     public Employee addEmployee(Employee employee) throws EmployeeNotValidException, IdNumberNotValidException, NameNotValidException, EmailNotValidException {
-        Employee emp = employeeDAO.findByIdNumber(employee.getIdNumber());
+        Employee emp = employeeRepository.findByIdNumber(employee.getIdNumber());
         try {
             if(emp != null)
                 throw new AlreadyExistException(emp);
@@ -39,7 +39,7 @@ public class EmployeeService {
     public Employee updateEmployee(Employee employee) throws NotFoundException {
         Employee emp;
         try {
-            emp = employeeDAO.findByIdNumber(employee.getIdNumber());
+            emp = employeeRepository.findByIdNumber(employee.getIdNumber());
         } catch (Exception e) {
             throw new NotFoundException("NOt FOUND ", e);
         }
@@ -47,7 +47,7 @@ public class EmployeeService {
     }
 
     public Employee getEmployeeById(Long id) throws EmployeeNotFoundException {
-        Optional<Employee> employee = this.employeeDAO.findById(id);
+        Optional<Employee> employee = this.employeeRepository.findById(id);
         if (employee.isPresent()) {
             return employee.get();
         } else {
@@ -56,7 +56,7 @@ public class EmployeeService {
     }
 
     public Employee getEmployeeByIdNumber(String employeeId) throws EmployeeNotFoundException {
-        Employee employee = employeeDAO.findByIdNumber(employeeId);
+        Employee employee = employeeRepository.findByIdNumber(employeeId);
         if (employee != null) {
             return employee;
         } else {
@@ -66,7 +66,7 @@ public class EmployeeService {
 
     public List<Employee> getAllEmployees() throws CustomException {
         try {
-            return this.employeeDAO.findAll();
+            return this.employeeRepository.findAll();
         } catch (Exception e) {
             throw new CustomException(Employee.class, "Failed to retrieve all employees");
         }
@@ -83,8 +83,8 @@ public class EmployeeService {
 
     public void deleteEmployee(Long id) {
         try {
-            if (employeeDAO.existsById(id)) {
-                employeeDAO.deleteById(id);
+            if (employeeRepository.existsById(id)) {
+                employeeRepository.deleteById(id);
             } else {
                 throw new CustomException(Employee.class,"Employee with ID " + id + " not found.");
             }
@@ -94,21 +94,21 @@ public class EmployeeService {
     }
 
     public void suspendAccount(Long accountId) throws AccountNotFoundException {
-        Account account = accountDAO.findAccountById(accountId);
+        Account account = accountRepository.findAccountById(accountId);
         if (account == null) {
             throw new AccountNotFoundException("Account with ID " + accountId + " not found.");
         }
         account.setStatus(StatusInSystem.IRREGULAR);
-        accountDAO.save(account);
+        accountRepository.save(account);
     }
 
     public void restrictAccount(Long accountId) throws AccountNotFoundException {
-        Account account = accountDAO.findAccountById(accountId);
+        Account account = accountRepository.findAccountById(accountId);
         if (account == null) {
             throw new AccountNotFoundException("Account with ID " + accountId + " not found.");
         }
         account.setStatus(StatusInSystem.RESTRICTED);
-        accountDAO.save(account);
+        accountRepository.save(account);
     }
 
     public void manageCustomerDeposit(Long employeeId, Long customerId, Long accountId, Double amount) throws Exception {
